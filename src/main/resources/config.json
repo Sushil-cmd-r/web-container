@@ -1,6 +1,9 @@
 {
   "port": 9999,
-  "paths": {
-    "/hello": "com.company.HelloServlet"
-  }
+  "paths": [
+    {
+      "endpoint": "/hello",
+      "servlet": "com.company.HelloServlet"
+    }
+  ]
 }

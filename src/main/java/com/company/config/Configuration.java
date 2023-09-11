@@ -1,16 +1,21 @@
 package com.company.config;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+@JacksonXmlRootElement(localName = "Configuration")
 public class Configuration {
     private int port;
-    private Map<String, String> paths;
+    private List<Path> paths = new ArrayList<>();
 
     public int getPort() {
         return port;
     }
 
-    public Map<String, String> getPaths() {
+    public List<Path> getPaths() {
         return paths;
     }
 
@@ -22,3 +27,27 @@ public class Configuration {
                 '}';
     }
 }
+
+class Path {
+    private String endpoint;
+    private String servlet;
+
+    public String getEndpoint() {
+        return endpoint;
+    }
+
+    public String getServlet() {
+        return servlet;
+    }
+
+    @Override
+    public String toString() {
+        return "Path{" +
+                "endpoint='" + endpoint + '\'' +
+                ", servlet='" + servlet + '\'' +
+                '}';
+    }
+}
+
+
+

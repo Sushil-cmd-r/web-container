@@ -44,6 +44,7 @@ public class ConfigManager {
                 line = reader.readLine();
             }
 
+            System.out.println(buffer.toString());
             return mapper.parse(buffer.toString());
 
 
