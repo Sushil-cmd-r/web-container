@@ -1,58 +1,44 @@
 package com.company.container;
 
-import java.io.BufferedReader;
-import java.io.PrintWriter;
+import com.company.config.ConfigManager;
+import com.company.config.ConfigType;
+import com.company.config.Configuration;
+
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.nio.channels.Channels;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.StandardCharsets;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ServerContainer {
     private final int port;
+    private final ConfigManager configManager;
 
-    public ServerContainer(int port) {
+    public ServerContainer(int port, ConfigType type) {
         this.port = port;
+        this.configManager = ConfigManager.getInstance(type);
     }
 
     private void start() {
+        ExecutorService executor = Executors.newFixedThreadPool(5);
+        Configuration config = configManager.loadConfig();
+        System.out.println(config);
         try(ServerSocketChannel serverSocket = ServerSocketChannel.open()) {
             serverSocket.bind(new InetSocketAddress(port));
 
-            SocketChannel conn = serverSocket.accept();
-            BufferedReader reader = new BufferedReader(Channels.newReader(conn, UTF_8));
-            PrintWriter writer = new PrintWriter(Channels.newWriter(conn, UTF_8));
-
-            String line = reader.readLine();
-            while (!line.isEmpty()) {
-                System.out.println(line);
-                line = reader.readLine();
+            while (serverSocket.isOpen()) {
+                SocketChannel conn = serverSocket.accept();
+                executor.submit(new RequestHandler(conn));
             }
 
-            writer.println("""
-                    HTTP/1.1 200 OK
-                    Content-Type: text/html
-                    
-                    <html>
-                        <body>
-                            <h1>Hello World</h1>
-                        </body>
-                    </html>
-                    """);
-            writer.flush();
-
-            reader.close();
-            writer.close();
-            conn.close();
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            executor.shutdown();
         }
     }
 
     public static void main(String[] args) {
-        new ServerContainer(8888).start();
+        new ServerContainer(8888, ConfigType.JSON).start();
     }
 }

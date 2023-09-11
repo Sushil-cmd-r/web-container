@@ -1,0 +1,6 @@
+<Configuration>
+    <port>9999</port>
+    <paths>
+        <hello.world>com.company.HelloServlet</hello.world>
+    </paths>
+</Configuration>
